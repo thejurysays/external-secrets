@@ -28,12 +28,13 @@ import (
 	"github.com/BeyondTrust/go-client-library-passwordsafe/api/secrets"
 	"github.com/BeyondTrust/go-client-library-passwordsafe/api/utils"
 	backoff "github.com/cenkalti/backoff/v4"
-	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	esv1beta1 "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
+
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 const (
@@ -50,6 +51,7 @@ var (
 	errMissingSecretName         = errors.New("must specify a secret name")
 	errMissingSecretKey          = errors.New("must specify a secret key")
 	errSecretRefAndValueMissing  = errors.New("must specify either secret reference or direct value")
+	ESOlogger                    = ctrl.Log.WithName("provider").WithName("beyondtrust")
 )
 
 // this struct will hold the keys that the service returns.
@@ -106,6 +108,7 @@ func (*Provider) SecretExists(_ context.Context, _ esv1beta1.PushSecretRemoteRef
 
 // NewClient this is where we initialize the SecretClient and return it for the controller to use.
 func (p *Provider) NewClient(ctx context.Context, store esv1beta1.GenericStore, kube client.Client, namespace string) (esv1beta1.SecretsClient, error) {
+	ESOlogger.Info("Getting Client...")
 	config := store.GetSpec().Provider.Beyondtrust
 
 	clientID, err := loadConfigSecret(ctx, config.Clientid, kube, namespace)
@@ -201,8 +204,7 @@ func (p *Provider) GetAllSecrets(_ context.Context, _ esv1beta1.ExternalSecretFi
 // GetSecret reads the secret from the Express server and returns it. The controller uses the value here to
 // create the Kubernetes secret.
 func (p *Provider) GetSecret(_ context.Context, ref esv1beta1.ExternalSecretDataRemoteRef) ([]byte, error) {
-	logger, _ := zap.NewDevelopment()
-	zapLogger := logging.NewZapLogger(logger)
+	zapLogger := logging.NewLogrLogger(&ESOlogger)
 
 	secretData := strings.Split(ref.Key, "/")
 
@@ -295,6 +297,7 @@ func (p *Provider) ValidateStore(store esv1beta1.GenericStore) (admission.Warnin
 
 // registers the provider object to process on each reconciliation loop.
 func init() {
+	ESOlogger.Info("Starting Porvider using logger...")
 	esv1beta1.Register(&Provider{}, &esv1beta1.SecretStoreProvider{
 		Beyondtrust: &esv1beta1.BeyondtrustProvider{},
 	})
