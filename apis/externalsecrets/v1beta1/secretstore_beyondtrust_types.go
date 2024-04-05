@@ -14,7 +14,7 @@ type BeyondTrustProviderSecretRef struct {
 }
 
 type BeyondtrustProvider struct {
-	ApiURL         string                        `json:"apiurl"`
+	APIURL         string                        `json:"apiurl"`
 	Clientid       *BeyondTrustProviderSecretRef `json:"clientid"`
 	Clientsecret   *BeyondTrustProviderSecretRef `json:"clientsecret"`
 	Certificate    *BeyondTrustProviderSecretRef `json:"certificate,omitempty"`
