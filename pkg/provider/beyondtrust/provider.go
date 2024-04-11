@@ -257,8 +257,7 @@ func (p *Provider) GetSecret(_ context.Context, ref esv1beta1.ExternalSecretData
 		secret.Value = returnSecret
 	}
 
-	// TODO: library should do the JoinPath("Auth/Signout") also defer body.Close() should be protected.
-	err = p.authenticate.SignOut(p.authenticate.ApiUrl.JoinPath("Auth/Signout").String())
+	err = p.authenticate.SignOut()
 	if err != nil {
 		return nil, fmt.Errorf("error: %w", err)
 	}
