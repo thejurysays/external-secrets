@@ -123,14 +123,9 @@ func (p *Provider) NewClient(ctx context.Context, store esv1beta1.GenericStore, 
 	clientTimeOutInSeconds := 45
 	retryMaxElapsedTimeMinutes := 15
 	separator := "/"
-	verifyca := true
 
 	if config.Separator != "" {
 		separator = config.Separator
-	}
-
-	if !config.VerifyCA {
-		verifyca = config.VerifyCA
 	}
 
 	if config.Clienttimeoutseconds != 0 {
@@ -169,14 +164,14 @@ func (p *Provider) NewClient(ctx context.Context, store esv1beta1.GenericStore, 
 	}
 
 	// validate inputs
-	errorsInInputs := utils.ValidateInputs(clientID, clientSecret, &apiURL, clientTimeOutInSeconds, &separator, verifyca, logger, certificate, certificateKey, &retryMaxElapsedTimeMinutes, &maxFileSecretSizeBytes)
+	errorsInInputs := utils.ValidateInputs(clientID, clientSecret, &apiURL, clientTimeOutInSeconds, &separator, config.VerifyCA, logger, certificate, certificateKey, &retryMaxElapsedTimeMinutes, &maxFileSecretSizeBytes)
 
 	if errorsInInputs != nil {
 		return nil, fmt.Errorf("error: %w", errorsInInputs)
 	}
 
 	// creating a http client
-	httpClientObj, _ := utils.GetHttpClient(clientTimeOutInSeconds, verifyca, certificate, certificateKey, logger)
+	httpClientObj, _ := utils.GetHttpClient(clientTimeOutInSeconds, config.VerifyCA, certificate, certificateKey, logger)
 
 	// instantiating authenticate obj, injecting httpClient object
 	authenticate, _ := auth.Authenticate(*httpClientObj, backoffDefinition, apiURL, clientID, clientSecret, logger, retryMaxElapsedTimeMinutes)

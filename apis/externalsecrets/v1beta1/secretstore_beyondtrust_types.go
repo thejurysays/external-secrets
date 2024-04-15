@@ -37,6 +37,6 @@ type BeyondtrustProvider struct {
 	Certificatekey       *BeyondTrustProviderSecretRef `json:"certificatekey,omitempty"`
 	Retrievaltype        string                        `json:"retrievaltype,omitempty"`
 	Separator            string                        `json:"separator,omitempty"`
-	VerifyCA             bool                          `json:"verifyca,omitempty"`
+	VerifyCA             bool                          `json:"verifyca"`
 	Clienttimeoutseconds int                           `json:"clienttimeoutseconds,omitempty"`
 }

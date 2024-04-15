@@ -2868,6 +2868,7 @@ spec:
                         - apiurl
                         - clientid
                         - clientsecret
+                        - verifyca
                       type: object
                     chef:
                       description: Chef configures this store to sync secrets with chef server
@@ -8252,6 +8253,7 @@ spec:
                         - apiurl
                         - clientid
                         - clientsecret
+                        - verifyca
                       type: object
                     chef:
                       description: Chef configures this store to sync secrets with chef server
