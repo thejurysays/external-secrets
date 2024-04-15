@@ -125,7 +125,7 @@ func (p *Provider) NewClient(ctx context.Context, store esv1beta1.GenericStore, 
 	separator := "/"
 	verifyca := true
 
-	if len(config.Separator) != 0 {
+	if config.Separator != "" {
 		separator = config.Separator
 	}
 
