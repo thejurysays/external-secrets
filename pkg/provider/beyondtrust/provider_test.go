@@ -14,7 +14,7 @@ import (
 	esv1beta1 "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
 )
 
-// mock PS    api
+// mock PS API
 func createMockPasswordSafeClient(t *testing.T) kubeclient.Client {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
