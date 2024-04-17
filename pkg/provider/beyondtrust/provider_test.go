@@ -1,3 +1,17 @@
+/*
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implieclient.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package beyondtrust
 
 import (
@@ -14,13 +28,11 @@ import (
 	esv1beta1 "github.com/external-secrets/external-secrets/apis/externalsecrets/v1beta1"
 )
 
-// mock PS API
 func createMockPasswordSafeClient(t *testing.T) kubeclient.Client {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-
 		case "/Auth/SignAppin":
-			_, err := w.Write([]byte(`{"UserId":1, "EmailAddress":"Felipe"}`))
+			_, err := w.Write([]byte(`{"UserId":1, "EmailAddress":"fake@beyondtrust.com"}`))
 			if err != nil {
 				t.Error("Test case Failed")
 			}
@@ -32,12 +44,12 @@ func createMockPasswordSafeClient(t *testing.T) kubeclient.Client {
 			}
 
 		case "/secrets-safe/secrets":
-			_, err := w.Write([]byte(`[{"SecretType": "FILE", "Password": "credential_in_sub_3_password","Id": "9152f5b6-07d6-4955-175a-08db047219ce","Title": "credential_in_sub_3"}]`))
+			_, err := w.Write([]byte(`[{"SecretType": "FILE", "Password": "credential_in_sub_3_password","Id": "12345678-07d6-4955-175a-08db047219ce","Title": "credential_in_sub_3"}]`))
 			if err != nil {
 				t.Error("Test case Failed")
 			}
 
-		case "/secrets-safe/secrets/9152f5b6-07d6-4955-175a-08db047219ce/file/download":
+		case "/secrets-safe/secrets/12345678-07d6-4955-175a-08db047219ce/file/download":
 			_, err := w.Write([]byte(`fake_password`))
 			if err != nil {
 				t.Error("Test case Failed")
@@ -86,7 +98,7 @@ func TestNewClient(t *testing.T) {
 			Spec: esv1beta1.SecretStoreSpec{
 				Provider: &esv1beta1.SecretStoreProvider{
 					Beyondtrust: &esv1beta1.BeyondtrustProvider{
-						APIURL:        "https://test.ps-dev.beyondtrustcloud.com:443/BeyondTrust/api/public/v3/",
+						APIURL:        "https://example.com:443/BeyondTrust/api/public/v3/",
 						Retrievaltype: "SECRET",
 						Clientid: &esv1beta1.BeyondTrustProviderSecretRef{
 							Value: "12345678-25fg-4b05-9ced-35e7dd5093ae",
@@ -103,7 +115,6 @@ func TestNewClient(t *testing.T) {
 
 		assert.Nil(t, err)
 	})
-
 }
 
 func TestNewClientBadClientId(t *testing.T) {
@@ -115,7 +126,7 @@ func TestNewClientBadClientId(t *testing.T) {
 			Spec: esv1beta1.SecretStoreSpec{
 				Provider: &esv1beta1.SecretStoreProvider{
 					Beyondtrust: &esv1beta1.BeyondtrustProvider{
-						APIURL:        "https://test.ps-dev.beyondtrustcloud.com:443/BeyondTrust/api/public/v3/",
+						APIURL:        "https://example.com:443/BeyondTrust/api/public/v3/",
 						Retrievaltype: "SECRET",
 						Clientid: &esv1beta1.BeyondTrustProviderSecretRef{
 							Value: "6138d050",
@@ -132,7 +143,6 @@ func TestNewClientBadClientId(t *testing.T) {
 
 		assert.Equal(t, err.Error(), "error: Key: 'UserInputValidaton.ClientId' Error:Field validation for 'ClientId' failed on the 'min' tag", "The two errors should be the same.")
 	})
-
 }
 
 func TestNewClientBadClientSecret(t *testing.T) {
@@ -144,7 +154,7 @@ func TestNewClientBadClientSecret(t *testing.T) {
 			Spec: esv1beta1.SecretStoreSpec{
 				Provider: &esv1beta1.SecretStoreProvider{
 					Beyondtrust: &esv1beta1.BeyondtrustProvider{
-						APIURL:        "https://test.ps-dev.beyondtrustcloud.com:443/BeyondTrust/api/public/v3/",
+						APIURL:        "https://example.com:443/BeyondTrust/api/public/v3/",
 						Retrievaltype: "SECRET",
 						Clientid: &esv1beta1.BeyondTrustProviderSecretRef{
 							Value: "12345678-25fg-4b05-9ced-35e7dd5093ae",
@@ -161,7 +171,6 @@ func TestNewClientBadClientSecret(t *testing.T) {
 
 		assert.Equal(t, err.Error(), "error: Key: 'UserInputValidaton.ClientSecret' Error:Field validation for 'ClientSecret' failed on the 'min' tag", "The two error should be the same.")
 	})
-
 }
 
 func TestNewClientBadSeparator(t *testing.T) {
@@ -173,7 +182,7 @@ func TestNewClientBadSeparator(t *testing.T) {
 			Spec: esv1beta1.SecretStoreSpec{
 				Provider: &esv1beta1.SecretStoreProvider{
 					Beyondtrust: &esv1beta1.BeyondtrustProvider{
-						APIURL:        "https://test.ps-dev.beyondtrustcloud.com:443/BeyondTrust/api/public/v3/",
+						APIURL:        "https://example.com:443/BeyondTrust/api/public/v3/",
 						Separator:     "//",
 						Retrievaltype: "SECRET",
 						Clientid: &esv1beta1.BeyondTrustProviderSecretRef{
@@ -191,7 +200,6 @@ func TestNewClientBadSeparator(t *testing.T) {
 
 		assert.Equal(t, err.Error(), "error: Key: 'UserInputValidaton.Separator' Error:Field validation for 'Separator' failed on the 'max' tag")
 	})
-
 }
 
 func TestNewClientBadClientTimeOutinSeconds(t *testing.T) {
@@ -203,7 +211,7 @@ func TestNewClientBadClientTimeOutinSeconds(t *testing.T) {
 			Spec: esv1beta1.SecretStoreSpec{
 				Provider: &esv1beta1.SecretStoreProvider{
 					Beyondtrust: &esv1beta1.BeyondtrustProvider{
-						APIURL:               "https://test.ps-dev.beyondtrustcloud.com:443/BeyondTrust/api/public/v3/",
+						APIURL:               "https://example.com:443/BeyondTrust/api/public/v3/",
 						Separator:            "/",
 						Clienttimeoutseconds: 400,
 						Retrievaltype:        "SECRET",
@@ -222,5 +230,4 @@ func TestNewClientBadClientTimeOutinSeconds(t *testing.T) {
 
 		assert.Equal(t, err.Error(), "error: Key: 'UserInputValidaton.ClientTimeOutinSeconds' Error:Field validation for 'ClientTimeOutinSeconds' failed on the 'lte' tag")
 	})
-
 }
