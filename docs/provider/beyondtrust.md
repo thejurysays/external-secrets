@@ -120,5 +120,5 @@ spec:
 
 ```shell
 # WARNING: this command will reveal the stored secret in plain text
-kubectl get secret my-beyondtrust-secret -o jsonpath="{.data.password}" | base64 --decode && echo
+kubectl get secret my-beyondtrust-secret -o jsonpath="{.data.secretKey}" | base64 --decode && echo
 ```
